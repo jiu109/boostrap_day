@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "http://mybatis.org/dtd/mybatis-3-mapper.dtd" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.EmpDAO">
+
+
+    <resultMap id="empMap" type="Emp">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="age" property="age"/>
+        <result column="salary" property="salary"/>
+        <result column="sex" property="sex"/>
+
+        <!--部门信息-->
+        <association property="dept" javaType="Dept">
+            <id column="did" property="id"/>
+            <result column="dname" property="name"/>
+            <result column="createDate" property="createDate"/>
+        </association>
+
+    </resultMap>
+
+
+
+
+    <!--delete-->
+    <delete id="delete" parameterType="String">
+        delete from
+            t_emp
+        where
+            id=#{id}
+    </delete>
+
+    <!--update-->
+    <update id="update" parameterType="Emp">
+        update t_emp
+        set
+            name=#{name},age=#{age},sex=#{sex},salary=#{salary},deptid=#{dept.id}
+        where
+            id = #{id}
+    </update>
+
+    <!--save-->
+    <insert id="save" parameterType="Emp">
+        insert into t_emp
+        values (#{id},#{name},#{age},#{sex},#{salary},#{dept.id})
+    </insert>
+
+    <select id="findAll" resultMap="empMap">
+        SELECT
+        e.id,e.name,e.age,e.salary,e.sex,e.deptid,
+        d.id did,d.name dname,d.createDate
+        FROM
+        (
+        SELECT
+        id,
+        NAME,
+        age,
+        sex,
+        salary,
+        deptid
+        FROM
+        t_emp
+        LIMIT #{start},#{rows}
+        ) e
+        LEFT JOIN t_dept d
+        ON e.deptid = d.id
+    </select>
+
+    <select id="findTotalCounts" resultType="long">
+        select count(id) from t_emp
+    </select>
+
+</mapper>
